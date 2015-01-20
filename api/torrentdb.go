@@ -19,7 +19,7 @@ type Torrent struct {
 	Btih     string `bson:"_id,omitempty"`
 	Title    string
 	Category string
-	Size int
+	Size     int
 	Details  []string
 	Download []string
 	Swarm    Stats
@@ -39,6 +39,7 @@ func NewTorrentDB(url string) (*TorrentDB, error) {
 	session.SetMode(mgo.Monotonic, true)
 	collection := session.DB("bitcannon").C("torrents")
 	collection.EnsureIndex(mgo.Index{Key: []string{"$text:title"}, Name: "title"})
+	collection.EnsureIndex(mgo.Index{Key: []string{"category"}, Name: "category"})
 	return &TorrentDB{session, collection}, nil
 }
 
@@ -128,7 +129,7 @@ func (torrentDB *TorrentDB) Insert(btih string, title string, category string, s
 		&Torrent{Btih: btih,
 			Title:    title,
 			Category: category,
-			Size: size,
+			Size:     size,
 			Details:  []string{details},
 			Download: []string{download},
 			Swarm:    Stats{Seeders: -1, Leechers: -1},
